@@ -3,7 +3,7 @@
 //////////////////////
 // WiFi Definitions //
 //////////////////////
-const char WiFiAPPSK[] = "Sylvain_Amica";
+const char WiFiAPPSK[] = "Sylvain_Amica"; // Juste pour créer une nouvelle branche
 
 /////////////////////
 // Pin Definitions //
