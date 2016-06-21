@@ -3,7 +3,7 @@
 //////////////////////
 // WiFi Definitions //
 //////////////////////
-const char WiFiAPPSK[] = "Sylvain_Amica";
+const char WiFiAPPSK[] = "Sylvain_Amica"; // Ceci est le MDP de mon ESP
 
 /////////////////////
 // Pin Definitions //
