@@ -15,5 +15,6 @@ Idée d'instrumentation :
 -	Diode rouge puissante
 -	Support carte SD
 
-Fonctions à développer '\n'
+Fonctions à développer
+
 -lecture capteur ...
