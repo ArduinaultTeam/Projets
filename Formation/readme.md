@@ -7,3 +7,6 @@ Sujets à aborder :
 - Moteur
 - Communication UART (USB)
 - Capteur/actionneurs
+- Fonctions
+- Bibliothèque
+- Librairie externe
