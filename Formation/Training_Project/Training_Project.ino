@@ -45,7 +45,7 @@ void loop() // fonction loop - est exécutée en boucle
   Photoresistance2 = analogRead(PHOTO_R2);
 
   // Condition à respecter pour activer la LED
-  if ( abs(Photoresistance1 - Photoresistance2) > 100) // abs pour avoir une valeur absolue, pour ne pas avoir de valeurs négative.
+  if ( abs(Photoresistance1 - Photoresistance2) > 100) // abs pour avoir une valeur absolue, pour ne pas avoir de valeurs négatives.
   {
     ActiveLED = 1;
   }
