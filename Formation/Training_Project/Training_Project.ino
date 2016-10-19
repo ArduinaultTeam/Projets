@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------------
-//Capteur Luminosité
+//Projet formation
 
 //Concept :
 //1 bouton ON/OFF
