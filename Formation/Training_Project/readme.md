@@ -19,4 +19,15 @@ L'écriture propre :
   La réflexion avant de coder est importante : à quoi va servir ma fonction, ses données d'entrées, de sortie, les variables etc ...
   L'Arduino fait TOUJOURS ce qu'on lui demande de faire. En cas de problème cela signifie que vous avez mal demandé ^^
 
+__________________________________________________________________________________________________________________________
+
+Etat actuel d'avancement :
+
+Développement des boutons (80% - Manque l'ajout de 2 boutons)
+Récupération et le traitement des informations des photoresistances (100%)
+Utilisation du 7 segments (60% - Manque le développement des fonctions associées)
+Utilisation de la LED (100%)
+Développement du séquenceur (30%)
+Fonctionnement en déportée (sur batterie) (0%)
+
 2015-00166
