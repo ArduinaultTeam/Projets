@@ -23,11 +23,16 @@ ________________________________________________________________________________
 
 Etat actuel d'avancement :
 
-Développement des boutons (80% - Manque l'ajout de 2 boutons)
-Récupération et le traitement des informations des photoresistances (100%)
-Utilisation du 7 segments (60% - Manque le développement des fonctions associées)
-Utilisation de la LED (100%)
-Développement du séquenceur (30%)
-Fonctionnement en déportée (sur batterie) (0%)
+  Développement des boutons (80% - Manque l'ajout de 2 boutons)
+  
+  Récupération et le traitement des informations des photoresistances (100%)
+  
+  Utilisation du 7 segments (60% - Manque le développement des fonctions associées)
+  
+  Utilisation de la LED (100%)
+  
+  Développement du séquenceur (30%)
+  
+  Fonctionnement en déportée (sur batterie) (0%)
 
 2015-00166
