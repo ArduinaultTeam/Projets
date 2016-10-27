@@ -27,11 +27,11 @@ Etat actuel d'avancement :
   
   Récupération et le traitement des informations des photoresistances (100%)
   
-  Utilisation du 7 segments (60% - Manque le développement des fonctions associées)
+  Utilisation du 7 segments (100%)
   
   Utilisation de la LED (100%)
   
-  Développement du séquenceur (30%)
+  Développement du séquenceur (50%)
   
   Fonctionnement en déportée (sur batterie) (0%)
 
