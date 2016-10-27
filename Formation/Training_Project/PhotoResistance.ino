@@ -17,7 +17,7 @@ int ActiveLED = 0;
 int active = 0;
 int previous_bouton = 0;
 int actual_bouton = 0;
-int sequenceur = 0;
+int allume = 0;
 
 int unite = 0;
 int dizaine = 0;
@@ -34,23 +34,14 @@ void setup() // fonction setup - début de l'exécution du programme
 
 void loop() 
 {
-
   actual_bouton = digitalRead(BUTTON_1);
-
-  Serial.print(sequenceur);
-   Serial.print(actual_bouton);
-   Serial.println(previous_bouton);
 
   if((actual_bouton == 1) && (previous_bouton == 0))
   {
-    if (sequenceur == 0)
-      sequenceur = 1;
-      else
-      sequenceur = 0;
-    Serial.println(sequenceur);
+      allume = !allume;
   }
   
-  if (sequenceur) // Par défaut le button = 0 pour le mettre = 1 par défaut, utiliser "!" --> (digitalRead(!BUTTON_1))
+  if (allume)
   {
     
     display.setBrightness(0x0f);
