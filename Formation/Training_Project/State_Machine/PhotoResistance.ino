@@ -46,29 +46,29 @@ void setup() // fonction setup - début de l'exécution du programme
 
 void loop() 
 {
-  loadButtons();
+  loadButtons(); // Fonction qui charge les valeurs des boutons pour la future séquence
   
-  if((actual_bouton1 == 1) && (previous_bouton1 == 0)) // Etat 0 -> 1
+  if((actual_bouton1 == 1) && (previous_bouton1 == 0)) 
   {
     sequenceur = !sequenceur;
   }
  
-  if (sequenceur)
+  if (sequenceur)// Etat 0 -> 1
   {
-   state = whichState();
+   state = whichState(); // nous permet de savoir vers quel état on doit se diriger
 
    Serial.println(state);
 
    switch(state)
    {
-   case 1 :
+   case 1 : // Dans cet état on veut juste allumer la led
     if (activate())
       digitalWrite(LED, HIGH);
     break;
-    case 2 :
+    case 2 : // On affiche la valeur des photoresistances sur le 7seg
       affichage_7seg();
     break;
-    case 3 :
+    case 3 : // On affiche 8888 sur le 7seg
       uint8_t tabSeg[] = { 0xff, 0xff, 0xff, 0xff };
       display.setBrightness(0x0f);
       display.setSegments(tabSeg);
@@ -78,7 +78,7 @@ void loop()
   }
   else
   {
-    state0();
+    state0(); // On éteint notre système et on réinitialise les variables
   }
-  updateVar();
+  updateVar(); // On met à jour les variables de sequence
 }
