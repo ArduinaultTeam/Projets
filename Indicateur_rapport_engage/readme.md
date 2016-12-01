@@ -21,13 +21,13 @@ Remarque: Il faut savoir qu'on ne peut pas sauter une vitesse, elle se passe une
 Rappel du fonctionnement moto : Mouvement du levier de vitesse haut/bas, 1ère en bas les autres en haut, point mort entre la 1ère et la 2ème à détecter par 2 capteurs magnétique. Dans l’ordre : 102345, 0=Point mort, Info point mort disponible par contacteur d’origine.
 
 Liste des fonctionnalités:
-•	2 Interruptions rising ;
-•	Detection point mort ;
-•	7 Seg update.
+-2 Interruptions rising ;
+-Detection point mort ;
+-7 Seg update.
 
 Matériel électronique:
-•	Arduino Uno ou Nano ;
-•	2 Capteurs magnétique normalement ouvert ;
-•	Afficheur 7 Segments ;
-•	2 Convertisseur de tension 12V-5V.
+-Arduino Uno ou Nano ;
+-2 Capteurs magnétique normalement ouvert ;
+-Afficheur 7 Segments ;
+-2 Convertisseur de tension 12V-5V.
 
