@@ -1,18 +1,16 @@
 Projet de l'inclinaison moto :
 
+Afficher un barre graph + valeur en ° de prise d’angle en temps réel prêt des compteurs de la moto avec zone rouge (alerte) en cas de prise d’angle trop importante.
+Fonction commande des feux de virage de nuit : Allumage à droite ou gauche en fonction de l’inclinaison.
+Stockage des valeurs d’inclinaisons associées au tracé GPS pour analyse. 
 
-Afficher la valeur de prise d’angle en temps réel prêt des compteurs de la moto 
-avec allumage d’une diode rouge en cas de prise d’angle trop importante.
-
-Le stockage des valeurs d’inclinaisons associées au tracé GPS seraient intéressantes à analyser. 
 
 Idée d'instrumentation :
 
--	Arduino
+-	Arduino Nano
 -	Capteur d’angle/inclinaison
 -	Module GPS
--	Afficheur
--	Diode rouge puissante
+-	Afficheur Oled 128X64 (Bleu et Jaune)
 -	Support carte SD
 
 Fonctions à développer :
