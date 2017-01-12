@@ -50,7 +50,6 @@ Un afficheur 7 segments permet d'afficher le rapport engagé
     compteur = 2;
     neutre = 1;
   }
-  }
 
   else if (compteur == 5)
   {
