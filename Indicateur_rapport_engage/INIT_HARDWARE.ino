@@ -1,4 +1,4 @@
-// Declaration des pin entrée/sorties.
+// DECLARATION DES PINS:
 void inithardware()
 {
   pinMode(2, INPUT);
@@ -6,7 +6,7 @@ void inithardware()
   pinMode(4, INPUT);
   Serial.begin(9600);
   
-// Pin de sortie pour Update 7 segment.
+// Update 7 segment: ATTRIBUTION DES PINS
   pinMode(A, OUTPUT);
   pinMode(B, OUTPUT);
   pinMode(C, OUTPUT);
@@ -15,7 +15,7 @@ void inithardware()
   pinMode(F, OUTPUT);
   pinMode(G, OUTPUT);
 
-// Initialisation des sorties pour Update 7 segment.
+// Update 7 segment: INIT SORTIES
   digitalWrite(A, LOW);
   digitalWrite(B, LOW);
   digitalWrite(C, LOW);
