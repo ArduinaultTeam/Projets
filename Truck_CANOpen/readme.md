@@ -27,3 +27,11 @@
  
  - Separer le code par fonction
  - Si beaucoup de temps libre : transformer la structure en objet
+
+
+### Explications bonus :
+
+ - Il faut voir les structures comme des petits objets.
+ - Le plus simple pour savoir si ta stucture fonctionne bien c'est de créer une fonction dans le main qui te permet d'afficher ta structure.
+ - Pour afficher du binaire tu peux utiliser Serial.println(***variable***,BIN)
+ - L'avantage étant que quand cette fonction sera prête elle pourra t'aider à lire le message du côté du receveur
