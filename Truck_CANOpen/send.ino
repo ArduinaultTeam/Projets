@@ -17,7 +17,7 @@ struct message {
 };
 
 int arbitrage = 2;
-byte commande;
+int commande = 0;
 int donnees = 0;
 
 struct message envoyer = {arbitrage, commande, donnees};
