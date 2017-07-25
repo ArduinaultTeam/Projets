@@ -26,7 +26,7 @@ struct message envoyer = {arbitrage, commande, donnees};
 
 void setup() {
   
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
     Serial.println("CAN BUS Shield init fail");
@@ -48,7 +48,7 @@ void loop() {
 
   envoyer.commande = 0b000010;
   
-  bool ext = envoyer.commande>>5;
+  bool ext = envoyer.commande>>5;  // 0 = trame standard
   
   int mask = 0b001111;
   
@@ -68,7 +68,15 @@ void loop() {
   Serial.println(envoyer.commande);
 
   Serial.print("Donnees : ");
-  Serial.println(envoyer.donnees); 
+  Serial.println(envoyer.donnees);
+
+  Serial.print("Taille : ");
+  Serial.println(len);
+
+  Serial.print("Extension : ");
+  Serial.println(ext);
+
+  Serial.println("---------------");
 }
 
 /*********************************************************************************************************
