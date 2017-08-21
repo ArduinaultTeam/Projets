@@ -16,6 +16,8 @@ unsigned long int t = 90;
 int flag = 1;
 
 #define BOUTON 3
+int lum;
+int valeur_lum;
 
 
 void setup() {
@@ -25,7 +27,7 @@ void setup() {
   // init can bus : baudrate = 500k
   while (CAN_OK != CAN.begin(CAN_500KBPS)) {
     Serial.println("CAN BUS Shield init fail");
-    Serial.println(" Init CAN BUS Shield again");
+    Serial.println("Init CAN BUS Shield again");
     delay(100);
   }
   
@@ -56,21 +58,25 @@ void loop() {
     
     // print the data
     for(int i = 0; i<len; i++) {
-      Serial.print(buf[i], HEX);
+      Serial.print(buf[i], DEC);
       Serial.print("\t");
     }
     
     Serial.println();
+    
+    buf[0] = lum;
+    valeur_lum = map(lum, 0, 127, 0, 1023);
+    Serial.println(valeur_lum);
   }
 
 
   // ENVOYER
   // send data:  id = 0x00, standrad frame, data len = 8, stmp: data buf
-  stmp[0] = (stmp[0] == 2 ) ? 3 : 2;
-  
+/*  stmp[0] = (stmp[0] == 2 ) ? 3 : 2;
+    
   if (digitalRead(BOUTON) || t < 20) {
-    for ( int j = 1; j < 8; j++) {
-      stmp[j]=9;
+    for (int i = 1; i < 8; i++) {
+      stmp[i]=9;
     }
 
     stmp[0] = 100;
@@ -93,7 +99,7 @@ void loop() {
     stmp [0] = 100;
     t = 90;
     flag = 1;
-    CAN.sendMsgBuf(0x01, 0, 8, stmp);
+    CAN.sendMsgBuf(0x00, 0, 8, stmp);
     
     for (int i = 0; i < 8; i++) {
       stmp[i]=0;
@@ -114,8 +120,9 @@ void loop() {
       }
     }
   }
+*/
   
-  CAN.sendMsgBuf(0x01, 0, 8, stmp);
+  CAN.sendMsgBuf(0x00, 0, 8, stmp);
   // send data per 100ms    unsigned char len = 0;
   delay(100);
 }
