@@ -7,17 +7,22 @@
 
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
-const int SPI_CS_PIN = 9;
+#define SPI_CS_PIN 9;
 
 // Set CS pin
 MCP_CAN CAN(SPI_CS_PIN);
 
+// Set Pin value for button
+#define BOUTON 3
+
+// Set photoresistance values
+int lum = 0; // lum value receive from CAN
+int valeur_lum = 0; // lum value after map operation. From 0..127 to 0..1023
+
+// Set values for problem detection
 unsigned long int t = 90;
 int flag = 1;
 
-#define BOUTON 3
-int lum;
-int valeur_lum;
 
 
 void setup() {
