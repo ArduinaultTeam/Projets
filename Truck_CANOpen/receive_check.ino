@@ -64,7 +64,7 @@ void loop() {
     
     Serial.println();
     
-    buf[0] = lum;
+    lum = buf[0];
     valeur_lum = map(lum, 0, 127, 0, 1023);
     Serial.println(valeur_lum);
   }
