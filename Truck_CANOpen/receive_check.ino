@@ -13,6 +13,12 @@ const int SPI_CS_PIN = 9;
 
 MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
 
+unsigned long int t = 90;
+
+int flag = 1;
+
+#define BOUTON 3
+
 void setup()
 {
     Serial.begin(115200);
@@ -24,31 +30,82 @@ void setup()
         delay(100);
     }
     Serial.println("CAN BUS Shield init ok!");
+
+    pinMode(BOUTON, INPUT);
 }
+
+unsigned char stmp[8] = {2, 0, 0, 0, 0, 0, 0, 0};
 
 
 void loop()
 {
-    unsigned char len = 0;
-    unsigned char buf[8];
+    // RECEVOIR
+    reception ();
 
-    if(CAN_MSGAVAIL == CAN.checkReceive())            // check if data coming
+    // ENVOYER
+    // send data:  id = 0x00, standrad frame, data len = 8, stmp: data buf
+    stmp[0] = (stmp[0] == 2 ) ? 3 : 2;
+    
+    if (digitalRead(BOUTON) || t < 20)
     {
-        CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
-
-        unsigned int canId = CAN.getCanId();
-        
-        Serial.println("-----------------------------");
-        Serial.print("Get data from ID: ");
-        Serial.println(canId, HEX);
-
-        for(int i = 0; i<len; i++)    // print the data
+        for ( int j = 1; j < 8; j++)
         {
-            Serial.print(buf[i], HEX);
-            Serial.print("\t");
+            stmp[j]=9;
         }
-        Serial.println();
+
+        stmp[0] = 100;
+        
+        if (flag  == 1)
+        {
+            t = 0;
+            flag = 0;
+        }
+
+        else
+        {
+            t++;
+        }
     }
+
+    else if (t == 20)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            stmp[i]=1;
+        }
+        
+        stmp [0] = 100;
+        t = 90;
+        flag = 1;
+        CAN.sendMsgBuf(0x01, 0, 8, stmp);
+        
+        for (int i = 0; i < 8; i++)
+        {
+            stmp[i]=0;
+        }
+        
+        stmp [0] = 2;
+    }
+    
+    else
+    {
+        stmp[7] = stmp[7]+2;
+        if(stmp[7] == 100)
+        {
+            stmp[7] = 0;
+            stmp[6] = stmp[6] + 1;
+            
+            if(stmp[6] == 100)
+            {
+                stmp[6] = 0;
+                stmp[5] = stmp[6] + 1;
+            }
+        }
+    }
+    
+    CAN.sendMsgBuf(0x01, 0, 8, stmp);
+    delay(100);                       // send data per 100ms    unsigned char len = 0;
+
 }
 
 /*********************************************************************************************************
