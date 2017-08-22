@@ -23,6 +23,8 @@ int valeur_lum = 0; // lum value after map operation. From 0..127 to 0..1023
 unsigned long int t = 90;
 int flag = 1;
 
+// Log values
+int temperature = 0;
 
 
 void setup() {
@@ -60,21 +62,37 @@ void loop() {
     Serial.println("-----------------------------");
     Serial.print("Get data from ID: ");
     Serial.println(canId, HEX);
-    
+      
+    if(buf[0]!=0)
+    {
     // print the data
     for(int i = 0; i<len; i++) {
       Serial.print(buf[i], DEC);
       Serial.print("\t");
     }
+        
+    }   // end if
+        
+    Serial.println("");
+      
+    }  // end reception
     
-    Serial.println();
     
-    lum = buf[0];
-    valeur_lum = map(lum, 0, 127, 0, 1023);
-    Serial.println(valeur_lum);
-  }
-
-
+    if(buf[0]==2) // Je suppose reception infos des capteurs
+    {
+    // traitement de l'info
+    Serial.println(buf[1]);
+    temperature = buf[1];
+        
+    // Acknowledgment
+    stmp[0] = 3;
+    CAN.sendMsgBuf(0x00, 0, 8, stmp);
+    stmp[0]=0;
+    // send data per 100ms    unsigned char len = 0;
+    delay(100);
+        
+    } // end if
+    
   // ENVOYER
   // send data:  id = 0x00, standrad frame, data len = 8, stmp: data buf
 /*  stmp[0] = (stmp[0] == 2 ) ? 3 : 2;
