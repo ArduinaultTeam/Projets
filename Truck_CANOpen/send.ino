@@ -53,7 +53,7 @@ void loop() {
   // send data:  id = 0x00, standrad frame, data len = 8, stmp: data buf
   Serial.println(analogRead(LUM));
   valeur_lum = map(analogRead(LUM), 0, 1023, 0, 127);
-  stmp[0] = valeur_lum;
+  stmp[1] = valeur_lum;
   
 /*
   if (pb == 0) {
@@ -98,10 +98,21 @@ void loop() {
         Serial.print("\t");
       }
       
-      Serial.println();
+      Serial.println("");
   }
+    
+  else if(buf[0]==2) // Je suppose reception infos des capteurs
+  {
+    // traitement de l'info
+    
+    // Acknowledgment
+    stmp[0] = 3;
+    CAN.sendMsgBuf(0x01, 0, 8, stmp);
+    // send data per 100ms    unsigned char len = 0;
+    delay(100);
   }
-}
+  } 
+} // fin de loop
 
 /*
     else if (buf[0] == 100) {
