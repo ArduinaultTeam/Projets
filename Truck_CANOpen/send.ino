@@ -91,7 +91,7 @@ void loop() {
     Serial.print("Get data from ID: ");
     Serial.println(canId, HEX);
     
-  //if (buf[0] == 2) {
+  if (buf[0] != 0) {
       // print the data
       for(int i = 0; i<len; i++) {
         Serial.print(buf[i], HEX);
@@ -99,7 +99,7 @@ void loop() {
       }
       
       Serial.println();
-  //}
+  }
   }
 }
 
