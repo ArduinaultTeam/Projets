@@ -51,15 +51,6 @@ unsigned char buf[LONGUEUR_DATA];
 
 void loop() {
 
-  // ENVOYER
-  for(int i = 0; i < 8; i++) { // Initialisation du message {0, 0, 0, 0, 0, 0, 0, 0}
-    stmp[i] = 0;
-  }
-
-  CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-  delay(100);
-
-  // RECEVOIR
   unsigned char len = 0;
 
   // Check if data coming
@@ -105,7 +96,7 @@ void loop() {
 
       // Acknowledgment
       stmp[0] = 3;
-      CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
+      CAN.sendMsgBuf(0x03, 0, LENGTH, stmp);
       delay(100);
       stmp[0] = 0;
     } // Fin if
