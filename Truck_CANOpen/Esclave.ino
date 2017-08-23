@@ -9,12 +9,12 @@
 MCP_CAN CAN(SPI_CS_PIN);
 
 // Affectation
-#define VERT 4
+#define ROUGE 4
 #define LONGUEUR_DATA 8
 #define LENGTH 8
 
 // Déclaration variable
-int led_verte = 0;
+int led_rouge = 0;
 
 /**************************************************************************************/
 /*                                INITIALISATION                                      */
@@ -32,8 +32,8 @@ void setup() {
   
   Serial.println("CAN BUS Shield init ok!");
 
-  pinMode(VERT, OUTPUT);
-  digitalWrite(VERT, LOW);        
+  pinMode(ROUGE, OUTPUT);
+  digitalWrite(ROUGE, LOW);        
 } // Fin setup
 
 unsigned char stmp[LONGUEUR_DATA] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -44,16 +44,7 @@ unsigned char buf[LONGUEUR_DATA];
 /**************************************************************************************/
 
 void loop() {
-
-  // ENVOYER
-  for(int i = 0; i < 8; i++) { // Initialisation du message {0, 0, 0, 0, 0, 0, 0, 0}
-    stmp[i] = 0;
-  }
-
-  CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-  delay(100);
   
-  // RECEVOIR
   unsigned char len = 0;
   
   // Check if data coming
@@ -75,6 +66,18 @@ void loop() {
       } // Fin for
     
     Serial.println("");
+    } // Fin if
+    
+    if(buf[0] == 100) {
+      led_rouge = buf[5];
+      if (led_rouge == 1) digitalWrite(ROUGE, HIGH);
+      else digitalWrite(ROUGE, LOW);
+      
+      // Acknowledgment
+      stmp[0] = 101;
+      CAN.sendMsgBuf(0x02, 0, LENGTH, stmp);
+      delay(100);
+      stmp[0] = 0;
     } // Fin if
   } // Fin CAN receive 
 } // Fin loop
