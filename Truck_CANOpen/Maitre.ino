@@ -37,8 +37,10 @@ unsigned long int t3 = 0;
 
 // Detection des erreurs
 int nombre_erreurs_max = 10;
-int compteur_erreur_lum = false;
-int compteur_erreur_temp = false;
+int compteur_erreur_lum = 0;
+int compteur_erreur_temp = 0;
+
+bool message_pret = false;
 
 /**************************************************************************************/
 /*                                INITIALISATION                                      */
@@ -71,45 +73,58 @@ void loop() {
   
   if((compteur_erreur_lum < nombre_erreurs_max) || (compteur_erreur_temp < nombre_erreurs_max)) // Si cette condition est respectée tout va bien
   {
-  
-  // Code lumière
-  if(millis() - t1 > temps_cycle1) {
-    valeur_lum = map(analogRead(LUM), 0, 1023, 0, 255);
-    stmp[0] = 2;
-    stmp[7] = valeur_lum;
-    t1 = millis();
-    CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-    compteur_erreur_lum++;
-  } // Fin if lumière
+    // Code lumière
+    if(millis() - t1 > temps_cycle1) {
+      valeur_lum = map(analogRead(LUM), 0, 1023, 0, 255);
+      stmp[0] = 2;
+      stmp[7] = valeur_lum;
+      t1 = millis();
+    
+      message_pret = true;
+    
+      compteur_erreur_lum++;
+    } // Fin if lumière
     
   
-  // Code Température
-  if(millis() - t2 > temps_cycle2 || premier_cycle == 1) {
-    valeur_tension = map(analogRead(TMP), 0, 1023, 0, 5000);  // Transforme la valeur lue en tension
-    valeur_tmp = map(valeur_tension, 0, 1750, 0, 255);  // Transforme la tension pour le CAN
-    stmp[0] = 2;
-    stmp[6] = valeur_tmp;
-    t2 = millis();
-    premier_cycle = 0;
-    CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-    compteur_erreur_temp++;
-  } // Fin if température
+    // Code Température
+    if(millis() - t2 > temps_cycle2) {
+      valeur_tension = map(analogRead(TMP), 0, 1023, 0, 5000);  // Transforme la valeur lue en tension
+      valeur_tmp = map(valeur_tension, 0, 1750, 0, 255);  // Transforme la tension pour le CAN
+      stmp[0] = 2;
+      stmp[6] = valeur_tmp;
+      t2 = millis();
+      
+      message_pret = true;
+      
+      premier_cycle = 0;
+      
+      compteur_erreur_temp++;
+    } // Fin if température
     
   } // Fin if erreurs compteur
   
-  else if (millis() - t_erreur > temps_cycle_erreur)
+  else if ((compteur_erreur_temp >= nombre_erreurs_max) || (compteur_erreur_lum >= nombre_erreurs_max))
   {
     stmp[0] = 102; // Ce code serait donc une erreur de communication
     
     if(compteur_erreur_lum > nombre_erreurs_max)
-    stmp[7] = 1; // erreur communication lumière
+      stmp[7] = 1; // erreur communication lumière
+    else
+      stmp[7] = 0;
     
     if(compteur_erreur_temp > nombre_erreurs_max)
-    stmp[6] = 1; // erreur communication température
+      stmp[6] = 1; // erreur communication température
+    else
+      stmp[6] = 0;
     
     CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
   }
 
+  if(message_pret)
+  {
+    CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
+    message_pret = false;
+  }
     
   // Code interrupteur
   etat_bouton = digitalRead(BOUTON);
