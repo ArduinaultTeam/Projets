@@ -16,12 +16,22 @@ MCP_CAN CAN(SPI_CS_PIN);
 #define LENGTH 8
 
 // Déclaration variable
+int premier_cycle = 1;
 int valeur_lum = 0;
 int valeur_tension = 0;
 int valeur_tmp = 0;
-int led_verte = 0;
-int etat_bouton = 0;
 int tmp = 0;
+int interrupteur = LOW;
+int bascule = 0;
+int etat_bouton = 0;
+
+// Déclaration temporisation
+unsigned long int temps_cycle1 = 1000; // Lumière
+unsigned long int t1 = 0;
+unsigned long int temps_cycle2 = 10000; // Température
+unsigned long int t2 = 0;
+unsigned long int temps_cycle3 = 125; // Bouton
+unsigned long int t3 = 0;
 
 /**************************************************************************************/
 /*                                INITIALISATION                                      */
@@ -50,51 +60,50 @@ unsigned char buf[LONGUEUR_DATA];
 /**************************************************************************************/
 
 void loop() {
-  
-  // ENVOYER
+
   // Code lumière
-  valeur_lum = map(analogRead(LUM), 0, 1023, 0, 255);
-  stmp[0] = 2;
-  stmp[7] = valeur_lum;
-  CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-  delay(200);
+  if(millis() - t1 > temps_cycle1) {
+    valeur_lum = map(analogRead(LUM), 0, 1023, 0, 255);
+    stmp[0] = 2;
+    stmp[7] = valeur_lum;
+    t1 = millis();
+    CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
+  } // Fin if
+    
   
   // Code Température
-  valeur_tension = map(analogRead(TMP), 0, 1023, 0, 5000);  // Transforme la valeur lue en tension
-  valeur_tmp = map(valeur_tension, 0, 1750, 0, 255);  // Transforme la tension pour le CAN
-  stmp[0] = 2;
-  stmp[6] = valeur_tmp;
-  CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-  delay(400);
-
-/*  etat_bouton = digitalRead(BOUTON);
-  if(etat_bouton == HIGH) {
-    stmp[0] = 100;
-    stmp[6] = 1;
-  }
-  else {
-    stmp[0] = 0;
-    stmp[6] = 0;
-  }
-  
-  // Code Bouton poussoir
-  if(digitalRead(BOUTON) && etat_bouton == 0) {
-    etat_bouton = 1;
+  if(millis() - t2 > temps_cycle2 || premier_cycle == 1) {
+    valeur_tension = map(analogRead(TMP), 0, 1023, 0, 5000);  // Transforme la valeur lue en tension
+    valeur_tmp = map(valeur_tension, 0, 1750, 0, 255);  // Transforme la tension pour le CAN
+    stmp[0] = 2;
+    stmp[6] = valeur_tmp;
+    t2 = millis();
+    premier_cycle = 0;
+    CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
   } // Fin if
-  
-  else if(digitalRead(BOUTON) && etat_bouton == 1) {
-    etat_bouton = 0;
-  } // Fin else if
-  */
 
-  for(int i = 0; i < 8; i++) { // Initialisation du message {0, 0, 0, 0, 0, 0, 0, 0}
-    stmp[i] = 0;
-  }
+    
+  // Code interrupteur
+  etat_bouton = digitalRead(BOUTON);
+  if (etat_bouton && millis() - t3 > temps_cycle3) { // On lit l'état du bouton et on teste si le bouton est pressé
+    if (bascule == 1) { // On regarde s'il y a un changement d'état
+      interrupteur = !interrupteur; // Si oui on change l'état de l'interrupteur
+      bascule = 0; // On réinitialise la bascule
+      stmp[0] = 100;
+      stmp[5] = interrupteur;
+      t3 = millis();
+      CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
+    } // Fin if     
+    
+    else {
+      bascule = 1; // Si le bouton n'est pas pressé, on active la bascule
+      stmp[0] = 100;
+      stmp[5] = interrupteur;
+      t3 = millis();
+      CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
+    } // Fin else
+  } // Fin if
 
-  CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-  delay(100);
-  
-  // RECEVOIR
   unsigned char len = 0;
   
   // Check if data coming
