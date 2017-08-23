@@ -12,6 +12,8 @@ MCP_CAN CAN(SPI_CS_PIN);
 #define LUM A0
 #define TMP A1
 #define BOUTON 4
+
+// Caractéristiques des messages
 #define LONGUEUR_DATA 8
 #define LENGTH 8
 
@@ -21,7 +23,7 @@ int valeur_lum = 0;
 int valeur_tension = 0;
 int valeur_tmp = 0;
 int tmp = 0;
-int interrupteur = LOW;
+int interrupteur = 0;
 int bascule = 0;
 int etat_bouton = 0;
 
@@ -32,6 +34,11 @@ unsigned long int temps_cycle2 = 10000; // Température
 unsigned long int t2 = 0;
 unsigned long int temps_cycle3 = 125; // Bouton
 unsigned long int t3 = 0;
+
+// Detection des erreurs
+int nombre_erreurs_max = 10;
+int compteur_erreur_lum = false;
+int compteur_erreur_temp = false;
 
 /**************************************************************************************/
 /*                                INITIALISATION                                      */
@@ -61,6 +68,10 @@ unsigned char buf[LONGUEUR_DATA];
 
 void loop() {
 
+  
+  if((compteur_erreur_lum < nombre_erreurs_max) || (compteur_erreur_temp < nombre_erreurs_max)) // Si cette condition est respectée tout va bien
+  {
+  
   // Code lumière
   if(millis() - t1 > temps_cycle1) {
     valeur_lum = map(analogRead(LUM), 0, 1023, 0, 255);
@@ -68,7 +79,8 @@ void loop() {
     stmp[7] = valeur_lum;
     t1 = millis();
     CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-  } // Fin if
+    compteur_erreur_lum++;
+  } // Fin if lumière
     
   
   // Code Température
@@ -80,7 +92,23 @@ void loop() {
     t2 = millis();
     premier_cycle = 0;
     CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-  } // Fin if
+    compteur_erreur_temp++;
+  } // Fin if température
+    
+  } // Fin if erreurs compteur
+  
+  else if (millis() - t_erreur > temps_cycle_erreur)
+  {
+    stmp[0] = 102; // Ce code serait donc une erreur de communication
+    
+    if(compteur_erreur_lum > nombre_erreurs_max)
+    stmp[7] = 1; // erreur communication lumière
+    
+    if(compteur_erreur_temp > nombre_erreurs_max)
+    stmp[6] = 1; // erreur communication température
+    
+    CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
+  }
 
     
   // Code interrupteur
@@ -127,6 +155,19 @@ void loop() {
     Serial.println("");
     } // Fin if
   } // Fin CAN receive 
+  
+  
+  
+  
+  
+  // Traitement des acknowledgment
+  if(buf[0] == 3) // Dès que l'on reçoit l'acknowledgment capteurs de la part du LCD on peut reset les compteurs d'erreur
+  {
+    compteur_erreur_lum = 0;
+    compteur_erreur_temp = 0;
+  }
+  
+  
 }  // Fin loop
 
 // --- Fin du programme ---
