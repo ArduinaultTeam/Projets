@@ -70,61 +70,54 @@ unsigned char buf[LONGUEUR_DATA];
 
 void loop() {
 
-  
   if((compteur_erreur_lum < nombre_erreurs_max) || (compteur_erreur_temp < nombre_erreurs_max)) // Si cette condition est respectée tout va bien
   {
     // Code lumière
     if(millis() - t1 > temps_cycle1) {
-      valeur_lum = map(analogRead(LUM), 0, 1023, 0, 255);
+      valeur_lum = map(analogRead(LUM), 0, 1023, 0, 255);  // Transforme la valeur pour le CAN
       stmp[0] = 2;
       stmp[7] = valeur_lum;
       t1 = millis();
-    
+      
       message_pret = true;
-    
+      
       compteur_erreur_lum++;
     } // Fin if lumière
+      
     
-  
     // Code Température
-    if(millis() - t2 > temps_cycle2) {
+    if(millis() - t2 > temps_cycle2 || premier_cycle == 1) {
       valeur_tension = map(analogRead(TMP), 0, 1023, 0, 5000);  // Transforme la valeur lue en tension
       valeur_tmp = map(valeur_tension, 0, 1750, 0, 255);  // Transforme la tension pour le CAN
-      stmp[0] = 2;
+      stmp[0] = 2; //
       stmp[6] = valeur_tmp;
       t2 = millis();
-      
+
       message_pret = true;
       
       premier_cycle = 0;
       
       compteur_erreur_temp++;
     } // Fin if température
-    
   } // Fin if erreurs compteur
-  
-  else if ((compteur_erreur_temp >= nombre_erreurs_max) || (compteur_erreur_lum >= nombre_erreurs_max))
-  {
-    stmp[0] = 102; // Ce code serait donc une erreur de communication
-    
-    if(compteur_erreur_lum > nombre_erreurs_max)
-      stmp[7] = 1; // erreur communication lumière
-    else
-      stmp[7] = 0;
-    
-    if(compteur_erreur_temp > nombre_erreurs_max)
-      stmp[6] = 1; // erreur communication température
-    else
-      stmp[6] = 0;
-    
-    CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-  }
 
-  if(message_pret)
-  {
+
+  else if ((compteur_erreur_temp >= nombre_erreurs_max) || (compteur_erreur_lum >= nombre_erreurs_max)) {
+    stmp[0] = 102; // Ce code serait donc une erreur de communication
+
+    if(compteur_erreur_lum > nombre_erreurs_max) stmp[7] = 1; // Erreur communication lumière
+    else stmp[7] = 0;
+    
+    if(compteur_erreur_temp > nombre_erreurs_max) stmp[6] = 1; // Erreur communication température
+    else stmp[6] = 0;
+    
     CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-    message_pret = false;
-  }
+  } // Fin else if
+
+  if(message_pret) {
+      CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
+      message_pret = false;
+    } // Fin if message_pret
     
   // Code interrupteur
   etat_bouton = digitalRead(BOUTON);
@@ -145,7 +138,8 @@ void loop() {
       t3 = millis();
       CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
     } // Fin else
-  } // Fin if
+  } // Fin if interrupteur 
+  
 
   unsigned char len = 0;
   
@@ -169,19 +163,16 @@ void loop() {
     
     Serial.println("");
     } // Fin if
-  } // Fin CAN receive 
+  } // Fin CAN receive
   
-  
-  
-  
-  
+  delay(100);
+
+
   // Traitement des acknowledgment
-  if(buf[0] == 3) // Dès que l'on reçoit l'acknowledgment capteurs de la part du LCD on peut reset les compteurs d'erreur
-  {
+  if(buf[0] == 3) { // Dès que l'on reçoit l'acknowledgment capteurs de la part du LCD on peut reset les compteurs d'erreur
     compteur_erreur_lum = 0;
     compteur_erreur_temp = 0;
   }
-  
   
 }  // Fin loop
 
