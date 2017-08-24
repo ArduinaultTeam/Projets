@@ -22,6 +22,10 @@ int valeur_lum = 0;
 int valeur_tmp = 0;
 int tmp = 0;
 
+// Déclaration temporisation
+unsigned long int temps_cycle = 100;
+unsigned long int t = 0;
+
 /**************************************************************************************/
 /*                                INITIALISATION                                      */
 /**************************************************************************************/
@@ -83,21 +87,22 @@ void loop() {
       valeur_tmp = map(buf[6], 0, 255, 0, 1750);
       tmp = map(valeur_tmp, 0, 1750, -50, 125);
       Serial.println(tmp);
-      
-      stmp[0] = 10;
-      
+  
       // Code Ecran LCD
       lcd.setCursor(0,0);  // Curseur à gauche sur la première ligne
-      if(valeur_lum < 750) {
-        lcd.print("Nuit");
-        stmp[4] = 1;
-      }
-      else {
-        lcd.print("Jour");
-        stmp[4] = 0;
-      }
+      if(millis() - t > temps_cycle) {
+        if(valeur_lum < 750) {
+          lcd.print("Nuit");
+          stmp[4] = 1;
+          t = millis();
+        }
       
-      CAN.sendMsgBuf(0x03, 0, LENGTH, stmp);
+        else {
+          lcd.print("Jour");
+          stmp[4] = 0;
+          t = millis();
+        }
+      }  
       
       lcd.setCursor(0,1);  // Curseur à gauche sur la deuxième ligne
       lcd.print(valeur_lum);
@@ -110,6 +115,7 @@ void loop() {
       stmp[0] = 3;
       CAN.sendMsgBuf(0x03, 0, LENGTH, stmp);
       stmp[0] = 0;
+      
     } // Fin if
   } // Fin CAN receive
   delay(100);
