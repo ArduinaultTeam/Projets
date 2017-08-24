@@ -13,7 +13,7 @@ MCP_CAN CAN(SPI_CS_PIN);
 
 LiquidCrystal lcd(8, 7, 6, 5, 4, 3);
 
-// Affectation
+// Caractéristiques des messages
 #define LONGUEUR_DATA 8
 #define LENGTH 8
 
@@ -86,21 +86,32 @@ void loop() {
       
       // Code Ecran LCD
       lcd.setCursor(0,0);  // Curseur à gauche sur la première ligne
-      lcd.print("Lum :");
-      lcd.setCursor(9,0);  // Curseur à la neuvième case de la première ligne
-      lcd.print("Tmp :");
+      if(valeur_lum < 750) {
+        lcd.print("Nuit");
+        stmp[0] = 10;
+        stmp[4] = 1;
+        CAN.sendMsgBuf(0x03, 0, LENGTH, stmp);
+      }
+      else {
+        lcd.print("Jour");
+        stmp[0] = 10;
+        stmp[4] = 0;
+        CAN.sendMsgBuf(0x03, 0, LENGTH, stmp);
+      }
       lcd.setCursor(0,1);  // Curseur à gauche sur la deuxième ligne
       lcd.print(valeur_lum);
+      lcd.setCursor(9,0);  // Curseur à la neuvième case de la première ligne
+      lcd.print("Tmp :");
       lcd.setCursor(9,1);  // Curseur à la neuvième case de la seconde ligne
       lcd.print(tmp);
 
       // Acknowledgment
       stmp[0] = 3;
       CAN.sendMsgBuf(0x03, 0, LENGTH, stmp);
-      delay(100);
       stmp[0] = 0;
     } // Fin if
   } // Fin CAN receive
+  delay(100);
 } // Fin loop
 
 // --- Fin du programme ---
