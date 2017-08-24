@@ -11,6 +11,7 @@ MCP_CAN CAN(SPI_CS_PIN);
 // Affectation
 #define LUM A0
 #define TMP A1
+#define POTAR A2
 #define BOUTON 4
 
 // Caractéristiques des messages
@@ -18,14 +19,17 @@ MCP_CAN CAN(SPI_CS_PIN);
 #define LENGTH 8
 
 // Déclaration variable
-int premier_cycle = 1;
 int valeur_lum = 0;
+
+int premier_cycle = 1;
 int valeur_tension = 0;
 int valeur_tmp = 0;
 int tmp = 0;
+
 int interrupteur = 0;
 int bascule = 0;
-int etat_bouton = 0;
+
+int valeur_potar = 0;
 
 // Déclaration temporisation
 unsigned long int temps_cycle1 = 1000; // Lumière
@@ -34,6 +38,8 @@ unsigned long int temps_cycle2 = 10000; // Température
 unsigned long int t2 = 0;
 unsigned long int temps_cycle3 = 125; // Bouton
 unsigned long int t3 = 0;
+unsigned long int temps_cycle4 = 100; // Potar
+unsigned long int t4 = 0;
 
 // Detection des erreurs
 int nombre_erreurs_max = 10;
@@ -120,9 +126,8 @@ void loop() {
     } // Fin if message_pret
     
   // Code interrupteur
-  etat_bouton = digitalRead(BOUTON);
-  if (etat_bouton && millis() - t3 > temps_cycle3) { // On lit l'état du bouton et on teste si le bouton est pressé
-    if (bascule == 1) { // On regarde s'il y a un changement d'état
+  if(digitalRead(BOUTON) && millis() - t3 > temps_cycle3) { // On lit l'état du bouton et on teste si le bouton est pressé
+    if(bascule == 1) { // On regarde s'il y a un changement d'état
       interrupteur = !interrupteur; // Si oui on change l'état de l'interrupteur
       bascule = 0; // On réinitialise la bascule
       stmp[0] = 100;
@@ -139,7 +144,16 @@ void loop() {
       CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
     } // Fin else
   } // Fin if interrupteur 
-  
+
+  // Code potar
+  if(interrupteur) {
+    valeur_potar = map(analogRead(POTAR), 0, 1023, 0, 255);
+    stmp[0] = 20;
+    stmp[3] = valeur_potar; 
+    t4 = millis();
+    CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);    
+  } // Fin if potar
+
 
   unsigned char len = 0;
   
@@ -150,7 +164,7 @@ void loop() {
 
     unsigned int canId = CAN.getCanId();
     
-    if (buf[0] != 0) {    
+    if(buf[0] != 0) {    
       Serial.println("-----------------------------");
       Serial.print("Get data from ID: ");
       Serial.println(canId, DEC);
@@ -162,6 +176,7 @@ void loop() {
       } // Fin for
     
     Serial.println("");
+    
     } // Fin if
   } // Fin CAN receive
   
@@ -172,7 +187,7 @@ void loop() {
   if(buf[0] == 3) { // Dès que l'on reçoit l'acknowledgment capteurs de la part du LCD on peut reset les compteurs d'erreur
     compteur_erreur_lum = 0;
     compteur_erreur_temp = 0;
-  }
+  }  // Fin if traitement des acknowledgement
   
 }  // Fin loop
 
