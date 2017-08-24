@@ -84,20 +84,21 @@ void loop() {
       tmp = map(valeur_tmp, 0, 1750, -50, 125);
       Serial.println(tmp);
       
+      stmp[0] = 10;
+      
       // Code Ecran LCD
       lcd.setCursor(0,0);  // Curseur à gauche sur la première ligne
       if(valeur_lum < 750) {
         lcd.print("Nuit");
-        stmp[0] = 10;
         stmp[4] = 1;
-        CAN.sendMsgBuf(0x03, 0, LENGTH, stmp);
       }
       else {
         lcd.print("Jour");
-        stmp[0] = 10;
         stmp[4] = 0;
-        CAN.sendMsgBuf(0x03, 0, LENGTH, stmp);
       }
+      
+      CAN.sendMsgBuf(0x03, 0, LENGTH, stmp);
+      
       lcd.setCursor(0,1);  // Curseur à gauche sur la deuxième ligne
       lcd.print(valeur_lum);
       lcd.setCursor(9,0);  // Curseur à la neuvième case de la première ligne
