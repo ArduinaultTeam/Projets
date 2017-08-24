@@ -8,9 +8,13 @@
 #define SPI_CS_PIN 9
 MCP_CAN CAN(SPI_CS_PIN);
 
+// Librairie servomoteur
+#include <Servo.h>
+
 // Affectation
 #define BLANC 3
 #define ROUGE 4
+#define PINSERVO 5
 
 // Caractéristiques des messages
 #define LONGUEUR_DATA 8
@@ -19,6 +23,12 @@ MCP_CAN CAN(SPI_CS_PIN);
 // Déclaration variable
 int led_rouge = 0;
 int led_blanche = 0;
+
+int valeur_moteur = 0;
+int commande_moteur = 0; // Variable qui stock la position du servomoteur
+
+// Création d'un objet servo pour le contrôler
+Servo servo;
 
 /**************************************************************************************/
 /*                                INITIALISATION                                      */
@@ -39,6 +49,8 @@ void setup() {
     pinMode(i, OUTPUT);
     digitalWrite(i, LOW); 
   }
+
+  servo.attach(PINSERVO); // On attache la pin
        
 } // Fin setup
 
@@ -74,15 +86,27 @@ void loop() {
     Serial.println("");
     } // Fin if
 
-    if(buf[0] == 10) {
+    if(buf[0] == 3) {
       led_blanche = buf[4];
-      if (led_blanche == 1) digitalWrite(BLANC, HIGH);
+      if(led_blanche) digitalWrite(BLANC, HIGH);
       else digitalWrite(BLANC, LOW);
 
       // Acknowledgment
       stmp[0] = 11;
       CAN.sendMsgBuf(0x02, 0, LENGTH, stmp);
       stmp[0] = 0;      
+    }
+
+    if(buf[0] == 20) {
+      valeur_moteur = buf[3];
+      commande_moteur = map(valeur_moteur, 0, 255, 0, 179);
+      servo.write(commande_moteur);
+      delay(100);
+
+      // Acknowledgment
+      stmp[0] = 21;
+      CAN.sendMsgBuf(0x02, 0, LENGTH, stmp);
+      stmp[0] = 0;  
     }
     
     if(buf[0] == 100) {
@@ -94,6 +118,7 @@ void loop() {
       stmp[0] = 101;
       CAN.sendMsgBuf(0x02, 0, LENGTH, stmp);
       stmp[0] = 0;
+      
     } // Fin if
   } // Fin CAN receive
   delay(100);
