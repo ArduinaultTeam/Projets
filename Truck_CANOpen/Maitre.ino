@@ -27,7 +27,7 @@ int valeur_tmp = 0;
 int tmp = 0;
 
 int interrupteur = 0;
-int bascule = 0;
+int old_bouton = 0;
 
 int valeur_potar = 0;
 
@@ -36,7 +36,7 @@ unsigned long int temps_cycle1 = 1000; // Lumière
 unsigned long int t1 = 0;
 unsigned long int temps_cycle2 = 10000; // Température
 unsigned long int t2 = 0;
-unsigned long int temps_cycle3 = 125; // Bouton
+unsigned long int temps_cycle3 = 100; // Bouton
 unsigned long int t3 = 0;
 unsigned long int temps_cycle4 = 100; // Potar
 unsigned long int t4 = 0;
@@ -126,29 +126,23 @@ void loop() {
     } // Fin if message_pret
     
   // Code interrupteur
-  if(digitalRead(BOUTON) && millis() - t3 > temps_cycle3) { // On lit l'état du bouton et on teste si le bouton est pressé
-    if(bascule == 1) { // On regarde s'il y a un changement d'état
-      interrupteur = !interrupteur; // Si oui on change l'état de l'interrupteur
-      bascule = 0; // On réinitialise la bascule
-      stmp[0] = 100;
-      stmp[5] = interrupteur;
-      t3 = millis();
-      CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-    } // Fin if     
+  if(digitalRead(BOUTON) && (old_bouton==0) && (millis() - t3 > temps_cycle3)) { // On lit l'état du bouton et on teste si le bouton est pressé
     
-    else {
-      bascule = 1; // Si le bouton n'est pas pressé, on active la bascule
+      interrupteur = !interrupteur; // Si oui on change l'état de l'interrupteur
       stmp[0] = 100;
       stmp[5] = interrupteur;
       t3 = millis();
       CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);
-    } // Fin else
-  } // Fin if interrupteur 
+    
+  } // Fin if  
+  old_bouton = digitalRead(BOUTON);
+    
 
   // Code potar
-  if(interrupteur) {
+  if(interrupteur && (millis() - t4 > temps_cycle4) && (millis() - t3 > temps_cycle4) ) {
     valeur_potar = map(analogRead(POTAR), 0, 1023, 0, 255);
     stmp[0] = 20;
+    stmp[1] = 0;
     stmp[3] = valeur_potar; 
     t4 = millis();
     CAN.sendMsgBuf(0x01, 0, LENGTH, stmp);    
@@ -187,6 +181,10 @@ void loop() {
   if(buf[0] == 3) { // Dès que l'on reçoit l'acknowledgment capteurs de la part du LCD on peut reset les compteurs d'erreur
     compteur_erreur_lum = 0;
     compteur_erreur_temp = 0;
+  }  // Fin if traitement des acknowledgement
+  
+  if(buf[0] == 20 && buf[1] == 1) { 
+    
   }  // Fin if traitement des acknowledgement
   
 }  // Fin loop
