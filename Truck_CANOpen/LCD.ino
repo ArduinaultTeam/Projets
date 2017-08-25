@@ -112,7 +112,10 @@ void loop() {
       lcd.print(tmp);
 
       // Acknowledgment
-      stmp[0] = 3;
+      for(int i =0; i< LONGUEUR_DATA;i++)
+        stmp[i] = buf[i];
+      stmp[1] = 1;
+      
       CAN.sendMsgBuf(0x03, 0, LENGTH, stmp);
       stmp[0] = 0;
       
