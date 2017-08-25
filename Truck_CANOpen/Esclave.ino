@@ -21,7 +21,6 @@ MCP_CAN CAN(SPI_CS_PIN);
 #define LENGTH 8
 
 // Déclaration variable
-int led_rouge = 0;
 int led_blanche = 0;
 
 int valeur_moteur = 0;
@@ -101,7 +100,6 @@ void loop() {
       valeur_moteur = buf[3];
       commande_moteur = map(valeur_moteur, 0, 255, 0, 179);
       servo.write(commande_moteur);
-      delay(100);
 
       // Acknowledgment
       stmp[0] = 21;
@@ -110,8 +108,7 @@ void loop() {
     }
     
     if(buf[0] == 100) {
-      led_rouge = buf[5];
-      if (led_rouge == 1) digitalWrite(ROUGE, HIGH);
+      if (buf[5]) digitalWrite(ROUGE, HIGH);
       else digitalWrite(ROUGE, LOW);
       
       // Acknowledgment
