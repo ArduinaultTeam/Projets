@@ -11,7 +11,7 @@ MCP_CAN CAN(SPI_CS_PIN);
 // Librairie servomoteur
 #include <Servo.h>
 
-// Affectation
+// Affectations
 #define BLANC 3
 #define ROUGE 4
 #define PINSERVO 5
@@ -20,7 +20,7 @@ MCP_CAN CAN(SPI_CS_PIN);
 #define LONGUEUR_DATA 8
 #define LENGTH 8
 
-// Déclaration variable
+// Déclaration variables
 int commande_moteur = 0; // Variable qui stock la position du servomoteur
 
 bool ack_pret = false;
@@ -121,7 +121,7 @@ void loop() {
     ack_pret = false;
   } // Fin if
       
-  delay(100);
+  delay(10);
 } // Fin loop
 
 // --- Fin du programme ---
