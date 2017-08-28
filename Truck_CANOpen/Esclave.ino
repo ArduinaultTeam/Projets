@@ -21,10 +21,9 @@ MCP_CAN CAN(SPI_CS_PIN);
 #define LENGTH 8
 
 // Déclaration variable
-int led_blanche = 0;
-
-int valeur_moteur = 0;
 int commande_moteur = 0; // Variable qui stock la position du servomoteur
+
+bool ack_pret = false;
 
 // Création d'un objet servo pour le contrôler
 Servo servo;
@@ -64,7 +63,7 @@ void loop() {
   
   unsigned char len = 0;
   
-  // Check if data coming
+  // Check if data coming **********
   if(CAN_MSGAVAIL == CAN.checkReceive()) {
     // Read data,  len: data length, buf: data buf
     CAN.readMsgBuf(&len, buf);
@@ -85,39 +84,43 @@ void loop() {
     Serial.println("");
     } // Fin if
 
+
+    // Code réception jour/nuit **********
     if(buf[0] == 3) {
-      led_blanche = buf[4];
-      if(led_blanche) digitalWrite(BLANC, HIGH);
+      if(buf[4]) digitalWrite(BLANC, HIGH);
       else digitalWrite(BLANC, LOW);
+      ack_pret = true;
+    } // Fin if
 
-      // Acknowledgment
-      stmp[0] = 11;
-      CAN.sendMsgBuf(0x02, 0, LENGTH, stmp);
-      stmp[0] = 0;      
-    }
 
+    // Code réception servomoteur **********
     if(buf[0] == 20) {
-      valeur_moteur = buf[3];
-      commande_moteur = map(valeur_moteur, 0, 255, 0, 179);
+      commande_moteur = map(buf[3], 0, 255, 0, 179);
       servo.write(commande_moteur);
+      ack_pret = true;
+    } // Fin if
 
-      // Acknowledgment
-      stmp[0] = 21;
-      CAN.sendMsgBuf(0x02, 0, LENGTH, stmp);
-      stmp[0] = 0;  
-    }
-    
+
+    // Code réception interrupteur **********
     if(buf[0] == 100) {
       if (buf[5]) digitalWrite(ROUGE, HIGH);
       else digitalWrite(ROUGE, LOW);
-      
-      // Acknowledgment
-      stmp[0] = 101;
-      CAN.sendMsgBuf(0x02, 0, LENGTH, stmp);
-      stmp[0] = 0;
-      
+      ack_pret = true;
     } // Fin if
   } // Fin CAN receive
+
+
+  // Acknowledgment **********
+  if(ack_pret) {
+    for(int i = 0; i < LONGUEUR_DATA; i++)  {
+      stmp[i] = buf[i];
+    } // Fin for
+    stmp[1] = 1;
+    CAN.sendMsgBuf(0x02, 0, LENGTH, stmp);
+    stmp[0] = 0;
+    ack_pret = false;
+  } // Fin if
+      
   delay(100);
 } // Fin loop
 
